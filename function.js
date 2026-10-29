@@ -1,451 +1,877 @@
-// Application State
-let students = JSON.parse(localStorage.getItem('students') || '[]');
-let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+// ---------------------------
+// Local Storage Helper Functions
+// ---------------------------
 
-// Save data to localStorage
-function saveData() {
-    localStorage.setItem('students', JSON.stringify(students));
-    localStorage.setItem('tasks', JSON.stringify(tasks));
+// Save a key-value pair in localStorage after converting value to JSON
+function setLocalStorageItem(key, value) {
+  localStorage.setItem(key, JSON.stringify(value));
 }
 
-// Navigation Functions
+// Retrieve a value from localStorage and parse it from JSON
+function getLocalStorageItem(key) {
+  const value = localStorage.getItem(key);
+  return value ? JSON.parse(value) : null;
+}
+
+// ---------------------------
+// Page Management Functions
+// ---------------------------
+
+// Show a specific page by ID and hide all other pages
+function showPage(pageId) {
+  // Select all elements with class 'page'
+  const pages = document.querySelectorAll(".page");
+
+  // Hide all pages
+  pages.forEach((page) => page.classList.remove("active"));
+
+  // Find the target page and show it
+  const pageToShow = document.getElementById(pageId);
+  if (pageToShow) {
+    pageToShow.classList.add("active");
+  }
+}
+
+// Show the home page
 function showHomePage() {
-    hideAllPages();
-    document.getElementById('homePage').classList.add('active');
+  showPage("homePage");
 }
 
-function showStaffPortal() {
-    hideAllPages();
-    document.getElementById('staffPage').classList.add('active');
-    updateStudentSelects();
-    loadStudentsTable();
-    loadTasksTable();
-    loadSubmissions();
+// Show the staff dashboard and load all related data
+function showStaffDashboard() {
+  showPage("staffPage");           // Show staff dashboard
+  loadStudents();                  // Load student list
+  loadTasks();                     // Load all tasks
+  loadSubmissions();              // Load task submissions
+  updateStudentDropdown();        // Update dropdown with students
+  updateAssignmentOptions();      // Update assignment-related options
+  loadTaskTracker();              // Load task progress tracker
 }
 
-function showStudentPortal() {
-    hideAllPages();
-    document.getElementById('studentPage').classList.add('active');
-    updateStudentSelects();
+// Show the student login page and update dropdown
+function showStudentLogin() {
+    const loginPage = document.getElementById("studentLoginPage");
+
+    if (!loginPage) {
+        alert("Student Login page HTML not found!");
+        return;
+    }
+
+    showPage("studentLoginPage");
+
+    updateStudentDropdown();
 }
 
-function hideAllPages() {
-    const pages = document.querySelectorAll('.page');
-    pages.forEach(page => page.classList.remove('active'));
+// Show the student dashboard and load assigned tasks
+function showStudentDashboard() {
+  showPage("studentPage");
+  loadStudentTasks();             // Load tasks for the logged-in student
 }
 
-// Tab Management
-function showTab(tabName) {
-    // Hide all tab contents
-    const tabContents = document.querySelectorAll('.tab-content');
-    tabContents.forEach(content => content.classList.remove('active'));
-    
-    // Remove active class from all tab buttons
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    tabBtns.forEach(btn => btn.classList.remove('active'));
-    
-    // Show selected tab content
-    document.getElementById(tabName + 'Tab').classList.add('active');
-    
-    // Add active class to clicked button
-    event.target.classList.add('active');
+// ---------------------------
+// Tab Navigation (e.g., inside a dashboard)
+// ---------------------------
+
+// Show a specific tab section and activate the related button
+function showTab(tabId) {
+  // Hide all tab contents
+  const tabs = document.querySelectorAll(".tab-content");
+  tabs.forEach((tab) => tab.classList.remove("active"));
+
+  // Deactivate all tab buttons
+  const tabButtons = document.querySelectorAll(".tab-btn");
+  tabButtons.forEach((button) => button.classList.remove("active"));
+
+  // Get the tab content to show and the button to activate
+  const tabToShow = document.getElementById(tabId + "Tab");
+  const buttonToActivate = document.querySelector(
+    `.tab-btn[onclick="showTab('${tabId}')"]`
+  );
+
+  // If both elements exist, activate them
+  if (tabToShow && buttonToActivate) {
+    tabToShow.classList.add("active");
+    buttonToActivate.classList.add("active");
+  }
 }
 
-// Handle assignment type change
-function handleAssignmentTypeChange() {
-    const assignmentType = document.getElementById('assignmentType').value;
-    const departmentGroup = document.getElementById('departmentGroup');
-    const studentGroup = document.getElementById('studentGroup');
-    
-    if (assignmentType === 'department') {
-        departmentGroup.style.display = 'block';
-        studentGroup.style.display = 'none';
-        document.getElementById('assignToStudent').value = '';
-    } else if (assignmentType === 'individual') {
-        departmentGroup.style.display = 'none';
-        studentGroup.style.display = 'block';
-        document.getElementById('assignToDepartment').value = '';
-        updateStudentSelects();
+// ---------------------------
+// Student Login Function
+// ---------------------------
+
+// Handle student login based on selected roll number
+function loginStudent() {
+  // Get the selected roll number from dropdown
+  const studentSelect = document.getElementById("studentSelect");
+  currentStudent = studentSelect.value;
+
+  // Proceed only if a roll number is selected
+  if (currentStudent) {
+    // Get the list of students from localStorage
+    const students = JSON.parse(localStorage.getItem("students") || "[]");
+
+    // Find the student object by roll number
+    const student = students.find((s) => s.rollNumber === currentStudent);
+
+    // If student is found, welcome them and show dashboard
+    if (student) {
+      const studentWelcome = document.getElementById("studentWelcome");
+      studentWelcome.textContent = `Welcome, ${student.name}!`;
+      showStudentDashboard(); // Navigate to student dashboard
     } else {
-        departmentGroup.style.display = 'none';
-        studentGroup.style.display = 'none';
+      // Student not found
+      alert("Student not found. Please contact staff.");
     }
+  } else {
+    // No selection made
+    alert("Please select your roll number.");
+  }
 }
 
-// Student Management
-document.getElementById('studentForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const studentId = document.getElementById('studentId').value;
-    const studentName = document.getElementById('studentName').value;
-    const studentDepartment = document.getElementById('studentDepartment').value;
-    const studentClass = document.getElementById('studentClass').value;
-    
-    // Check if student ID already exists
-    if (students.find(student => student.id === studentId)) {
-        showToast('Student ID already exists!', 'error');
-        return;
-    }
-    
-    const newStudent = {
-        id: studentId,
-        name: studentName,
-        department: studentDepartment,
-        class: studentClass
-    };
-    
-    students.push(newStudent);
-    saveData();
-    
-    document.getElementById('studentForm').reset();
-    loadStudentsTable();
-    updateStudentSelects();
-    showToast('Student added successfully!', 'success');
-});
 
-function loadStudentsTable() {
-    const tableBody = document.getElementById('studentsTableBody');
-    tableBody.innerHTML = '';
-    
-    students.forEach(student => {
-        const row = tableBody.insertRow();
-        row.innerHTML = `
-            <td>${student.id}</td>
-            <td>${student.name}</td>
-            <td>${student.department}</td>
-            <td>${student.class}</td>
-            <td>
-                <button class="btn btn-danger btn-sm" onclick="deleteStudent('${student.id}')">
-                    <i class="fas fa-trash"></i> Delete
-                </button>
-            </td>
-        `;
+// Load students with edit and delete buttons in staff portal
+function loadStudents() {
+  const students = JSON.parse(localStorage.getItem("students") || "[]");
+  const tableContainer = document.getElementById("studentsTable");
+
+  if (tableContainer) {
+    if (students.length === 0) {
+      tableContainer.innerHTML = '<p class="no-data">No students added yet.</p>';
+      return;
+    }
+
+    let tableHTML = `<table class="table">
+      <thead>
+        <tr><th>Name</th><th>Roll Number</th><th>Class</th><th>Year</th><th>Actions</th></tr>
+      </thead><tbody>`;
+
+    students.forEach((student) => {
+      tableHTML += `<tr>
+        <td>${student.name}</td>
+        <td>${student.rollNumber}</td>
+        <td>${student.class}</td>
+        <td>${student.year}</td>
+        <td>
+          <button class="btn btn-edit" onclick="editStudent('${student.rollNumber}')">Edit</button>
+          <button class="btn btn-delete" onclick="deleteStudent('${student.rollNumber}')">Delete</button>
+        </td>
+      </tr>`;
     });
+
+    tableHTML += "</tbody></table>";
+
+    tableContainer.innerHTML = tableHTML;
+  }
 }
 
-function deleteStudent(studentId) {
-    if (confirm('Are you sure you want to delete this student? This will also delete all their tasks.')) {
-        students = students.filter(student => student.id !== studentId);
-        tasks = tasks.filter(task => task.assignedTo !== studentId);
-        saveData();
-        loadStudentsTable();
-        loadTasksTable();
-        updateStudentSelects();
-        showToast('Student deleted successfully!', 'success');
+// Edit a student and prepare form for updates
+function editStudent(rollNumber) {
+  const students = JSON.parse(localStorage.getItem("students") || "[]");
+  const student = students.find((s) => s.rollNumber === rollNumber);
+  if (student) {
+    document.getElementById("studentName").value = student.name;
+    document.getElementById("rollNumber").value = student.rollNumber;
+    document.getElementById("studentClass").value = student.class;
+    document.getElementById("yearOfStudy").value = student.year;
+    deleteStudent(rollNumber, false); // Delete old before update
+  }
+}
+
+// Delete a student
+function deleteStudent(rollNumber, reloadList = true) {
+  let students = JSON.parse(localStorage.getItem("students") || "[]");
+  students = students.filter((s) => s.rollNumber !== rollNumber);
+  localStorage.setItem("students", JSON.stringify(students));
+  if (reloadList) {
+    loadStudents();
+    updateStudentDropdown();
+  }
+}
+
+// Load tasks with edit and delete buttons in staff portal
+function loadTasks() {
+  const tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+  const taskContainer = document.getElementById("tasksTable");
+
+  if (taskContainer) {
+    if (tasks.length === 0) {
+      taskContainer.innerHTML = '<p class="no-data">No tasks assigned yet.</p>';
+      return tasks;
     }
-}
 
-function updateStudentSelects() {
-    const selects = ['assignToStudent', 'studentSelect'];
-    
-    selects.forEach(selectId => {
-        const select = document.getElementById(selectId);
-        if (select) {
-            const currentValue = select.value;
-            select.innerHTML = '<option value="">Select Student</option>';
-            
-            students.forEach(student => {
-                const option = document.createElement('option');
-                option.value = student.id;
-                option.textContent = `${student.name} (${student.id}) - ${student.department}`;
-                select.appendChild(option);
-            });
-            
-            select.value = currentValue;
-        }
+    let tableHTML = `<table class="table">
+      <thead>
+        <tr><th>Title</th><th>Description</th><th>Deadline</th><th>Actions</th></tr>
+      </thead><tbody>`;
+
+    tasks.forEach((task) => {
+      tableHTML += `<tr>
+        <td>${task.title}</td>
+        <td>${task.description}</td>
+        <td>${task.deadline}</td>
+        <td>
+          <button class="btn btn-edit" onclick="editTask('${task.taskId}')">Edit</button>
+          <button class="btn btn-delete" onclick="deleteTask('${task.taskId}')">Delete</button>
+        </td>
+      </tr>`;
     });
+
+    tableHTML += "</tbody></table>";
+
+    taskContainer.innerHTML = tableHTML;
+  }
+  return tasks;
 }
 
-// Task Management
-document.getElementById('taskForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const taskTitle = document.getElementById('taskTitle').value;
-    const taskDescription = document.getElementById('taskDescription').value;
-    const taskDeadline = document.getElementById('taskDeadline').value;
-    const assignmentType = document.getElementById('assignmentType').value;
-    
-    let assignedStudents = [];
-    
-    if (assignmentType === 'individual') {
-        const assignedTo = document.getElementById('assignToStudent').value;
-        if (!assignedTo) {
-            showToast('Please select a student!', 'error');
-            return;
-        }
-        assignedStudents = [assignedTo];
-    } else if (assignmentType === 'department') {
-        const department = document.getElementById('assignToDepartment').value;
-        if (!department) {
-            showToast('Please select a department!', 'error');
-            return;
-        }
-        assignedStudents = students.filter(student => student.department === department).map(student => student.id);
-        
-        if (assignedStudents.length === 0) {
-            showToast('No students found in the selected department!', 'error');
-            return;
-        }
+// Edit a task and pre-fill form inputs
+function editTask(taskId) {
+  const tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+  const task = tasks.find((t) => t.taskId === taskId);
+  if (task) {
+    document.getElementById("taskTitle").value = task.title;
+    document.getElementById("taskDescription").value = task.description;
+    document.getElementById("taskDeadline").value = task.deadline;
+
+    const students = JSON.parse(localStorage.getItem("students") || "[]");
+    const assignedTo = task.assignedTo;
+
+    let assignmentType = "individual";
+
+    // Detect assignment type
+    const classesAssigned = new Set(
+      assignedTo.map((roll) => {
+        const s = students.find((stu) => stu.rollNumber === roll);
+        return s ? s.class : null;
+      })
+    );
+
+    const yearsAssigned = new Set(
+      assignedTo.map((roll) => {
+        const s = students.find((stu) => stu.rollNumber === roll);
+        return s ? s.year : null;
+      })
+    );
+
+    if (
+      classesAssigned.size === 1 &&
+      assignedTo.length ===
+        students.filter((s) => s.class === Array.from(classesAssigned)[0]).length
+    ) {
+      assignmentType = "class";
+      document.getElementById("assignmentType").value = "class";
+      updateAssignmentOptions();
+      document.getElementById("classSelect").value = Array.from(classesAssigned)[0];
+    } else if (
+      yearsAssigned.size === 1 &&
+      assignedTo.length ===
+        students.filter((s) => s.year === Array.from(yearsAssigned)[0]).length
+    ) {
+      assignmentType = "year";
+      document.getElementById("assignmentType").value = "year";
+      updateAssignmentOptions();
+      document.getElementById("yearSelect").value = Array.from(yearsAssigned)[0];
+    } else {
+      assignmentType = "individual";
+      document.getElementById("assignmentType").value = "individual";
+      updateAssignmentOptions();
+      assignedTo.forEach((roll) => {
+        let checkbox = document.getElementById(`student-${roll}`);
+        if (checkbox) checkbox.checked = true;
+      });
     }
-    
-    // Create tasks for all assigned students
-    assignedStudents.forEach(studentId => {
-        const newTask = {
-            id: 'task_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
-            title: taskTitle,
-            description: taskDescription,
-            deadline: taskDeadline,
-            assignedTo: studentId,
-            assignmentType: assignmentType,
-            department: assignmentType === 'department' ? document.getElementById('assignToDepartment').value : null,
-            status: 'pending',
-            submittedOn: null,
-            fileName: null,
-            fileContent: null,
-            notes: null
-        };
-        tasks.push(newTask);
-    });
-    
-    saveData();
-    document.getElementById('taskForm').reset();
-    handleAssignmentTypeChange(); // Reset form visibility
-    loadTasksTable();
-    
-    const message = assignmentType === 'department' ? 
-        `Task assigned to ${assignedStudents.length} students in the department!` : 
-        'Task created successfully!';
-    showToast(message, 'success');
-});
 
-function loadTasksTable() {
-    const tableBody = document.getElementById('tasksTableBody');
-    if (!tableBody) {
-        console.log('Tasks table body not found');
-        return;
+    const taskForm = document.getElementById("taskForm");
+    if (taskForm) {
+      taskForm.dataset.editingTaskId = task.taskId;
     }
-    
-    tableBody.innerHTML = '';
-    
-    console.log('Loading tasks:', tasks);
-    
-    tasks.forEach(task => {
-        const student = students.find(s => s.id === task.assignedTo);
-        const studentName = student ? `${student.name} (${student.department})` : 'Unknown';
-        const deadline = new Date(task.deadline).toLocaleString();
-        
-        const assignedToText = task.assignmentType === 'department' ? 
-            `${task.department} Dept.` : studentName;
-        
-        const row = tableBody.insertRow();
-        row.innerHTML = `
-            <td>${task.title}</td>
-            <td>${assignedToText}</td>
-            <td>${deadline}</td>
-            <td><span class="status-badge status-${task.status}">${task.status.toUpperCase()}</span></td>
-            <td>
-                <button class="btn btn-danger btn-sm" onclick="deleteTask('${task.id}')">
-                    <i class="fas fa-trash"></i> Delete
-                </button>
-                ${task.status === 'submitted' ? 
-                    `<button class="btn btn-success btn-sm" onclick="downloadFile('${task.id}')">
-                        <i class="fas fa-download"></i> Download
-                    </button>` : ''}
-            </td>
-        `;
-    });
+  }
 }
 
+// Delete a task
 function deleteTask(taskId) {
-    if (confirm('Are you sure you want to delete this task?')) {
-        tasks = tasks.filter(task => task.id !== taskId);
-        saveData();
-        loadTasksTable();
-        loadSubmissions();
-        showToast('Task deleted successfully!', 'success');
-    }
+  let tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+  tasks = tasks.filter((t) => t.taskId !== taskId);
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+  loadTasks();
+  loadTaskTracker();
 }
 
-// Student Portal Functions
-function loadStudentTasks() {
-    const studentId = document.getElementById('studentSelect').value;
-    const taskSection = document.getElementById('studentTasksSection');
-    const tasksList = document.getElementById('studentTasksList');
-    
-    if (!studentId) {
-        taskSection.style.display = 'none';
-        return;
+// Update the student dropdown for student login page
+function updateStudentDropdown() {
+  const studentSelect = document.getElementById("studentSelect");
+  if (!studentSelect) return;
+
+  studentSelect.innerHTML = '<option value="">Select your Roll Number</option>';
+
+  const students = JSON.parse(localStorage.getItem("students") || "[]");
+  students.forEach((student) => {
+    const option = document.createElement("option");
+    option.value = student.rollNumber;
+    option.textContent = `${student.rollNumber} - ${student.name}`;
+    studentSelect.appendChild(option);
+  });
+}
+
+// Update assignment options according to selected assignment type
+function updateAssignmentOptions() {
+  const assignmentTypeSelect = document.getElementById("assignmentType");
+  const assignmentTargets = document.getElementById("assignmentTargets");
+  if (!assignmentTargets || !assignmentTypeSelect) return;
+
+  const assignmentType = assignmentTypeSelect.value;
+  assignmentTargets.innerHTML = "";
+
+  const students = JSON.parse(localStorage.getItem("students") || "[]");
+
+  if (assignmentType === "individual") {
+    if (students.length === 0) {
+      assignmentTargets.innerHTML =
+        "<p>No students available. Add students first.</p>";
+      return;
     }
-    
-    taskSection.style.display = 'block';
-    
-    const studentTasks = tasks.filter(task => task.assignedTo === studentId);
-    tasksList.innerHTML = '';
-    
-    if (studentTasks.length === 0) {
-        tasksList.innerHTML = '<p class="no-tasks">No tasks assigned yet.</p>';
-        return;
-    }
-    
-    studentTasks.forEach(task => {
-        const deadline = new Date(task.deadline);
-        const isOverdue = deadline < new Date() && task.status === 'pending';
-        const statusClass = isOverdue ? 'overdue' : task.status;
-        
-        const taskCard = document.createElement('div');
-        taskCard.className = 'task-card';
-        taskCard.innerHTML = `
-            <h4>${task.title}</h4>
-            <p>${task.description}</p>
-            <div class="task-meta">
-                <div><strong>Deadline:</strong> ${deadline.toLocaleString()}</div>
-                <div><span class="status-badge status-${statusClass}">
-                    ${isOverdue ? 'OVERDUE' : task.status.toUpperCase()}
-                </span></div>
-                ${task.assignmentType === 'department' ? 
-                    `<div><strong>Department Assignment:</strong> ${task.department}</div>` : ''}
-            </div>
-            <div class="task-actions">
-                ${task.status === 'pending' ? 
-                    `<button class="btn btn-primary" onclick="openSubmissionModal('${task.id}')">
-                        <i class="fas fa-upload"></i> Submit Assignment
-                    </button>` : 
-                    `<div class="submission-info">
-                        <p><strong>Submitted on:</strong> ${new Date(task.submittedOn).toLocaleString()}</p>
-                        <p><strong>File:</strong> ${task.fileName}</p>
-                        ${task.notes ? `<p><strong>Notes:</strong> ${task.notes}</p>` : ''}
-                    </div>`
-                }
-            </div>
-        `;
-        tasksList.appendChild(taskCard);
+    let checkboxesHTML = '<div class="checkbox-group">';
+    students.forEach((student) => {
+      checkboxesHTML += `<div class="checkbox-item">
+          <input type="checkbox" id="student-${student.rollNumber}" value="${student.rollNumber}">
+          <label for="student-${student.rollNumber}">${student.name} (${student.rollNumber})</label>
+        </div>`;
     });
+    checkboxesHTML += "</div>";
+    assignmentTargets.innerHTML = checkboxesHTML;
+  } else if (assignmentType === "class") {
+    const classes = Array.from(
+      new Set(students.map((s) => s.class))
+    ).filter(Boolean);
+    if (classes.length === 0) {
+      assignmentTargets.innerHTML =
+        "<p>No classes available. Add students with classes first.</p>";
+      return;
+    }
+    let selectHTML = `<label for="classSelect">Select Class:</label>
+      <select id="classSelect">
+        <option value="">Select a class</option>`;
+    classes.forEach((className) => {
+      selectHTML += `<option value="${className}">${className}</option>`;
+    });
+    selectHTML += "</select>";
+    assignmentTargets.innerHTML = selectHTML;
+  } else if (assignmentType === "year") {
+    const years = Array.from(
+      new Set(students.map((s) => s.year))
+    ).filter(Boolean);
+    if (years.length === 0) {
+      assignmentTargets.innerHTML =
+        "<p>No years available. Add students with years first.</p>";
+      return;
+    }
+    let selectHTML = `<label for="yearSelect">Select Year:</label>
+      <select id="yearSelect">
+        <option value="">Select a year</option>`;
+    years.forEach((year) => {
+      selectHTML += `<option value="${year}">${year}</option>`;
+    });
+    selectHTML += "</select>";
+    assignmentTargets.innerHTML = selectHTML;
+  }
 }
 
-// File Submission Functions
-function openSubmissionModal(taskId) {
-    document.getElementById('taskIdForSubmission').value = taskId;
-    document.getElementById('submissionModal').style.display = 'block';
-}
+// Global variables
+let currentStudent = "";
+let currentTask = "";
+let selectedFile = null;
 
-function closeSubmissionModal() {
-    document.getElementById('submissionModal').style.display = 'none';
-    document.getElementById('submissionForm').reset();
-}
+// Initialize on page load
+document.addEventListener("DOMContentLoaded", function () {
+  loadStudents();
+  loadTasks();
+  loadSubmissions();
+  updateStudentDropdown();
+  updateAssignmentOptions();
 
-document.getElementById('submissionForm').addEventListener('submit', function(e) {
+  const fileInput = document.getElementById("fileInput");
+  if (fileInput) {
+    fileInput.addEventListener("change", handleFileSelection);
+  }
+});
+
+// Form submission handlers
+const studentForm = document.getElementById("studentForm");
+if (studentForm) {
+  studentForm.addEventListener("submit", function (e) {
     e.preventDefault();
-    
-    const taskId = document.getElementById('taskIdForSubmission').value;
-    const fileInput = document.getElementById('assignmentFile');
-    const notes = document.getElementById('submissionNotes').value;
-    const file = fileInput.files[0];
-    
-    if (!file) {
-        showToast('Please select a file to upload', 'error');
-        return;
-    }
-    
-    // Convert file to base64 for storage
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const task = tasks.find(t => t.id === taskId);
-        if (task) {
-            task.status = 'submitted';
-            task.submittedOn = new Date().toISOString();
-            task.fileName = file.name;
-            task.fileContent = e.target.result;
-            task.notes = notes;
-            
-            saveData();
-            closeSubmissionModal();
-            loadStudentTasks();
-            loadSubmissions();
-            showToast('Assignment submitted successfully!', 'success');
-        }
-    };
-    
-    reader.readAsDataURL(file);
-});
+    const studentName = document.getElementById("studentName").value.trim();
+    const rollNumber = document.getElementById("rollNumber").value.trim();
+    const studentClass = document.getElementById("studentClass").value.trim();
+    const yearOfStudy = document.getElementById("yearOfStudy").value.trim();
 
-// File Download Function
-function downloadFile(taskId) {
-    const task = tasks.find(t => t.id === taskId);
-    if (task && task.fileContent) {
-        const link = document.createElement('a');
-        link.href = task.fileContent;
-        link.download = task.fileName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        showToast('File downloaded successfully!', 'success');
-    } else {
-        showToast('File not found', 'error');
+    if (!studentName || !rollNumber) {
+      alert("Please fill in all required fields.");
+      return;
     }
+
+    addStudent(studentName, rollNumber, studentClass, yearOfStudy);
+  });
 }
 
-// Submissions Management
+const taskForm = document.getElementById("taskForm");
+if (taskForm) {
+  taskForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    const taskTitle = document.getElementById("taskTitle").value.trim();
+    const taskDescription = document.getElementById("taskDescription").value.trim();
+    const taskDeadline = document.getElementById("taskDeadline").value.trim();
+    const assignmentType = document.getElementById("assignmentType").value;
+
+    if (!taskTitle || !taskDescription || !taskDeadline) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+
+    assignTask(taskTitle, taskDescription, taskDeadline, assignmentType);
+  });
+}
+
+// Load submissions in the staff dashboard
 function loadSubmissions() {
-    const submissionsList = document.getElementById('submissionsList');
-    submissionsList.innerHTML = '';
-    
-    const submittedTasks = tasks.filter(task => task.status === 'submitted');
-    
-    if (submittedTasks.length === 0) {
-        submissionsList.innerHTML = '<p class="no-submissions">No submissions yet.</p>';
+    const submissions = JSON.parse(
+        localStorage.getItem("submissions") || "[]"
+    );
+
+    const container = document.getElementById("submissionsTable");
+
+    if (!container) {
+        console.error("submissionsTable element missing in HTML");
         return;
     }
-    
-    submittedTasks.forEach(task => {
-        const student = students.find(s => s.id === task.assignedTo);
-        const studentName = student ? `${student.name} (${student.department})` : 'Unknown';
-        
-        const submissionCard = document.createElement('div');
-        submissionCard.className = 'submission-card';
-        submissionCard.innerHTML = `
-            <h4>${task.title}</h4>
-            <div class="submission-meta">
-                <div><strong>Student:</strong> ${studentName}</div>
-                <div><strong>Submitted On:</strong> ${new Date(task.submittedOn).toLocaleString()}</div>
-                <div><strong>File Name:</strong> ${task.fileName}</div>
-                <div><strong>Deadline:</strong> ${new Date(task.deadline).toLocaleString()}</div>
-                ${task.assignmentType === 'department' ? 
-                    `<div><strong>Department Task:</strong> ${task.department}</div>` : ''}
-            </div>
-            ${task.notes ? `<p><strong>Student Notes:</strong> ${task.notes}</p>` : ''}
-            <div class="submission-actions">
-                <button class="btn btn-success btn-sm" onclick="downloadFile('${task.id}')">
-                    <i class="fas fa-download"></i> Download File
-                </button>
-            </div>
-        `;
-        submissionsList.appendChild(submissionCard);
-    });
-}
 
-// Toast Notification System
-function showToast(message, type = 'info') {
-    const toast = document.getElementById('toast');
-    toast.textContent = message;
-    toast.className = `toast ${type} show`;
-    
-    setTimeout(() => {
-        toast.classList.remove('show');
-    }, 3000);
-}
-
-// Initialize Application
-document.addEventListener('DOMContentLoaded', function() {
-    updateStudentSelects();
-    loadStudentsTable();
-    loadTasksTable();
-    loadSubmissions();
-});
-
-// Close modal when clicking outside
-window.onclick = function(event) {
-    const modal = document.getElementById('submissionModal');
-    if (event.target === modal) {
-        closeSubmissionModal();
+    if (submissions.length === 0) {
+        container.innerHTML = "<p>No submissions yet.</p>";
+        return;
     }
+
+    let html = `
+        <table>
+            <thead>
+                <tr>
+                    <th>Student Roll</th>
+                    <th>Task ID</th>
+                    <th>File Name</th>
+                    <th>Submitted Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    submissions.forEach(s => {
+        html += `
+            <tr>
+                <td>${s.studentRoll || "-"}</td>
+                <td>${s.taskId || "-"}</td>
+                <td>${s.file?.name || "No file"}</td>
+                <td>${s.submittedOn || "-"}</td>
+                <td>${s.status || "-"}</td>
+            </tr>
+        `;
+    });
+
+    html += "</tbody></table>";
+    container.innerHTML = html;
+}
+
+// File handling functions
+function handleFileSelection(event) {
+  const file = event.target.files[0];
+  const selectedFileName = document.getElementById("selectedFileName");
+
+  if (file) {
+    selectedFile = file;
+    selectedFileName.innerHTML = `<div class="file-preview">📎 ${file.name} (${formatFileSize(
+      file.size
+    )})</div>`;
+  } else {
+    selectedFile = null;
+    selectedFileName.innerHTML = "";
+  }
+}
+
+function formatFileSize(bytes) {
+  if (bytes === 0) return "0 Bytes";
+  const k = 1024;
+  const sizes = ["Bytes", "KB", "MB", "GB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+}
+
+
+function openUploadModal(taskId) {
+  currentTask = taskId;
+
+  const modal = document.getElementById("uploadModal");
+  const taskInfo = document.getElementById("uploadTaskInfo");
+  const fileInput = document.getElementById("fileInput");
+  const selectedFileName = document.getElementById("selectedFileName");
+
+  if (!modal) {
+    console.error("uploadModal element not found in HTML");
+    return;
+  }
+
+  const tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+  const task = tasks.find(t => t.taskId === taskId);
+
+  if (taskInfo && task) {
+    taskInfo.innerHTML = `
+      <p><strong>Task:</strong> ${task.title}</p>
+      <p><strong>Description:</strong> ${task.description}</p>
+      <p><strong>Deadline:</strong> ${task.deadline}</p>
+    `;
+  }
+
+  if (fileInput) fileInput.value = "";
+  if (selectedFileName) selectedFileName.innerHTML = "";
+
+  selectedFile = null;
+  modal.style.display = "block";
+}
+
+function closeUploadModal() {
+  const modal = document.getElementById("uploadModal");
+
+  if (modal) modal.style.display = "none";
+
+  selectedFile = null;
+}
+
+
+function submitAssignment() {
+  if (!selectedFile) {
+    alert("Please select a file to upload");
+    return;
+  }
+
+  const submissions = JSON.parse(localStorage.getItem("submissions") || "[]");
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const fileData = {
+      name: selectedFile.name,
+      size: selectedFile.size,
+      type: selectedFile.type,
+      data: e.target.result,
+      uploadDate: new Date().toISOString().split("T")[0],
+    };
+
+    const existingIndex = submissions.findIndex(
+      (s) => s.studentRoll === currentStudent && s.taskId === currentTask
+    );
+
+    const newSubmission = {
+      studentRoll: currentStudent,
+      taskId: currentTask,
+      file: fileData,
+      status: "submitted",
+      submittedOn: new Date().toISOString().split("T")[0],
+    };
+
+    if (existingIndex >= 0) {
+      submissions[existingIndex] = newSubmission;
+    } else {
+      submissions.push(newSubmission);
+    }
+
+    localStorage.setItem("submissions", JSON.stringify(submissions));
+
+    alert("Assignment uploaded successfully!");
+    closeUploadModal();
+    loadStudentTasks();
+    loadTaskTracker();
+  };
+
+  reader.readAsDataURL(selectedFile);
+}
+
+// Add a new student
+function addStudent(name, rollNumber, studentClass, yearOfStudy) {
+  let students = JSON.parse(localStorage.getItem("students") || "[]");
+
+  // Check duplicate rollNumber
+  const duplicate = students.find((s) => s.rollNumber === rollNumber);
+  if (duplicate) {
+    alert("Roll Number already exists. Please use a unique Roll Number.");
+    return;
+  }
+
+  const newStudent = {
+    id: "stu_" + Date.now(),
+    name: name,
+    rollNumber: rollNumber,
+    class: studentClass,
+    year: yearOfStudy,
+  };
+
+  students.push(newStudent);
+  localStorage.setItem("students", JSON.stringify(students));
+
+  loadStudents();
+
+  // Clear form fields
+  document.getElementById("studentName").value = "";
+  document.getElementById("rollNumber").value = "";
+  document.getElementById("studentClass").value = "";
+  document.getElementById("yearOfStudy").value = "";
+
+  updateStudentDropdown();
+}
+
+// Assign a task (supports edit by replacing existing)
+function assignTask(title, description, deadline, assignmentType) {
+  let tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+
+  const assignedTo = [];
+
+  if (assignmentType === "individual") {
+    const checkboxes = document.querySelectorAll(
+      "#assignmentTargets input[type='checkbox']:checked"
+    );
+    checkboxes.forEach((cb) => assignedTo.push(cb.value));
+  } else if (assignmentType === "class") {
+    const classSelect = document.getElementById("classSelect");
+    if (classSelect) {
+      const selectedClass = classSelect.value;
+      const students = JSON.parse(localStorage.getItem("students") || "[]");
+      students.forEach((student) => {
+        if (student.class === selectedClass) {
+          assignedTo.push(student.rollNumber);
+        }
+      });
+    }
+  } else if (assignmentType === "year") {
+    const yearSelect = document.getElementById("yearSelect");
+    if (yearSelect) {
+      const selectedYear = yearSelect.value;
+      const students = JSON.parse(localStorage.getItem("students") || "[]");
+      students.forEach((student) => {
+        if (student.year === selectedYear) {
+          assignedTo.push(student.rollNumber);
+        }
+      });
+    }
+  }
+
+  const taskForm = document.getElementById("taskForm");
+  const editingTaskId = taskForm && taskForm.dataset.editingTaskId;
+
+  if (editingTaskId) {
+    const idx = tasks.findIndex((t) => t.taskId === editingTaskId);
+    if (idx >= 0) tasks.splice(idx, 1);
+  }
+
+  const newTask = {
+    taskId: editingTaskId || "task_" + Date.now(),
+    title,
+    description,
+    deadline,
+    assignedTo,
+    createdOn: new Date().toISOString().split("T")[0],
+  };
+
+  tasks.push(newTask);
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+
+  // Clear form
+  document.getElementById("taskTitle").value = "";
+  document.getElementById("taskDescription").value = "";
+  document.getElementById("taskDeadline").value = "";
+  if (document.getElementById("assignmentType"))
+    document.getElementById("assignmentType").value = "individual";
+  updateAssignmentOptions();
+
+  if (taskForm) delete taskForm.dataset.editingTaskId;
+
+  loadTasks();
+  loadTaskTracker();
+}
+
+function loadStudentTasks() {
+  const container = document.getElementById("studentTasks");
+  if (!container || !currentStudent) return;
+
+  const tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+  const submissions = JSON.parse(localStorage.getItem("submissions") || "[]");
+
+  const studentTasks = tasks.filter((task) =>
+    task.assignedTo.includes(currentStudent)
+  );
+
+  if (studentTasks.length === 0) {
+    container.innerHTML = '<p class="no-data">No tasks assigned yet.</p>';
+    return;
+  }
+
+  let html = "";
+
+  studentTasks.forEach((task) => {
+    const submission = submissions.find(
+      (s) => s.studentRoll === currentStudent && s.taskId === task.taskId
+    );
+
+    const status = submission ? submission.status : "pending";
+    const isOverdue = new Date(task.deadline) < new Date() && status !== "completed";
+
+    html += `<div class="task-card">
+      <div class="task-header">
+        <div class="task-title">${task.title}</div>
+        <div class="task-status status-${status} ${isOverdue ? "overdue" : ""}">
+          ${
+            status === "completed"
+              ? "Completed"
+              : status === "submitted"
+              ? "Submitted"
+              : isOverdue
+              ? "Overdue"
+              : "Pending"
+          }
+        </div>
+      </div>
+      <div class="task-info">
+        <p><strong>Description:</strong> ${task.description}</p>
+        <p><strong>Deadline:</strong> ${task.deadline}</p>
+        <p><strong>Assigned:</strong> ${task.createdOn}</p>
+      </div>`;
+
+    if (submission && submission.file) {
+      html += `<div class="task-files">
+        <h5>Uploaded File:</h5>
+        <div class="file-item">
+          <div class="file-details">
+            <div class="file-name">📎 ${submission.file.name}</div>
+            <div class="file-size">${formatFileSize(submission.file.size)} • Uploaded: ${
+        submission.submittedOn
+      }</div>
+          </div>
+          <button onclick="downloadFile('${currentStudent}', '${task.taskId}')" class="download-btn">
+            Download
+          </button>
+        </div>
+      </div>`;
+    }
+
+    html += `<div class="task-actions">`;
+    if (status !== "completed") {
+      html += `<button onclick="openUploadModal('${task.taskId}')" class="btn btn-primary">${
+        submission ? "Update File" : "Upload Assignment"
+      }</button>`;
+      if (submission) {
+        html += `<button onclick="markCompleted('${task.taskId}')" class="btn btn-success">Mark as Completed</button>`;
+      }
+    } else {
+      html += `<span style="color: #059669; font-weight: 600;">✅ Task Completed</span>`;
+    }
+    html += `</div></div>`;
+  });
+
+  container.innerHTML = html;
+}
+
+// Mark assignment as completed
+function markCompleted(taskId) {
+  const submissions = JSON.parse(localStorage.getItem("submissions") || "[]");
+  const index = submissions.findIndex(
+    (s) => s.studentRoll === currentStudent && s.taskId === taskId
+  );
+
+  if (index >= 0) {
+    submissions[index].status = "completed";
+    localStorage.setItem("submissions", JSON.stringify(submissions));
+    loadStudentTasks();
+    loadTaskTracker();
+  }
+}
+
+// Download submitted file
+function downloadFile(studentRoll, taskId) {
+  const submissions = JSON.parse(localStorage.getItem("submissions") || "[]");
+  const submission = submissions.find(
+    (s) => s.studentRoll === studentRoll && s.taskId === taskId
+  );
+
+  if (submission && submission.file) {
+    const link = document.createElement("a");
+    link.href = submission.file.data;
+    link.download = submission.file.name;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+}
+
+
+// Load task tracker without completed checkbox (show status only)
+function loadTaskTracker() {
+  const container = document.getElementById("taskTracker");
+  if (!container) return;
+
+  const tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+  const students = JSON.parse(localStorage.getItem("students") || "[]");
+  const submissions = JSON.parse(localStorage.getItem("submissions") || "[]");
+
+  if (tasks.length === 0) {
+    container.innerHTML = '<p class="no-data">No tasks assigned yet.</p>';
+    return;
+  }
+
+  let html = '<div class="tracker-grid">';
+
+  tasks.forEach((task) => {
+    task.assignedTo.forEach((rollNumber) => {
+      const student = students.find((s) => s.rollNumber === rollNumber);
+      const submission = submissions.find(
+        (s) => s.studentRoll === rollNumber && s.taskId === task.taskId
+      );
+
+      const status = submission ? submission.status : "pending";
+      const isOverdue = new Date(task.deadline) < new Date() && status !== "completed";
+
+      html += `<div class="tracker-item">
+        <div class="tracker-header"><h4>${
+          student ? student.name : "Unknown Student"
+        }</h4></div>
+        <div class="tracker-status"><span class="task-status status-${status} ${
+        isOverdue ? "overdue" : ""
+      }">${
+        status === "completed"
+          ? "Completed"
+          : status === "submitted"
+          ? "Submitted"
+          : isOverdue
+          ? "Overdue"
+          : "Pending"
+      }</span></div>
+        <div class="tracker-details">
+          <p><strong>Task:</strong> ${task.title}</p>
+          <p><strong>Roll:</strong> ${rollNumber}</p>
+          <p><strong>Deadline:</strong> ${task.deadline}</p>`;
+
+      if (submission && submission.file) {
+        html += `<div class="file-info">
+            <span class="file-link" onclick="downloadFile('${rollNumber}', '${task.taskId}')">📎 ${
+          submission.file.name
+        }</span>
+            <small>(${formatFileSize(submission.file.size)})</small>
+            <button onclick="downloadFile('${rollNumber}', '${
+          task.taskId
+        }')" class="download-btn">Download</button>
+          </div>
+          <p><small>Submitted: ${submission.submittedOn}</small></p>`;
+      } else {
+        html += `<p><em>No file uploaded</em></p>`;
+      }
+
+      html += `</div></div>`;
+    });
+  });
+
+  html += "</div>";
+  container.innerHTML = html;
 }
