@@ -1,4 +1,11 @@
-/* Reset and Base Styles */
+
+/* ==========================================
+   CTMS - College Task Management System
+   Clean Blue-Purple Theme
+   Existing HTML IDs and classes preserved
+========================================== */
+
+/* 1. Global Styles */
 * {
     margin: 0;
     padding: 0;
@@ -8,668 +15,922 @@
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.6;
-    color: #333;
+    color: #263247;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
 }
 
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
+button,
+input,
+textarea,
+select {
+    font-family: inherit;
 }
 
-/* Page Management */
+button {
+    transition: background 0.25s ease,
+                transform 0.25s ease,
+                box-shadow 0.25s ease;
+}
+
+/* 2. Page Management */
 .page {
     display: none;
+    min-height: 100vh;
 }
 
 .page.active {
     display: block;
 }
 
-/* Home Page Styles */
+/* 3. Home Page */
 .home-container {
-    min-height: 100vh;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    padding: 2rem;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 40px 24px;
 }
 
-.hero-section {
+.home-header {
     text-align: center;
-    margin-bottom: 4rem;
-    color: white;
+    margin-bottom: 48px;
+    color: #ffffff;
 }
 
-.main-title {
-    font-size: 3.5rem;
-    font-weight: 700;
-    margin-bottom: 1rem;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+.home-header h1 {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    line-height: 1.2;
+    margin-bottom: 16px;
+    color: #ffffff;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
 }
 
-.main-subtitle {
-    font-size: 1.3rem;
-    opacity: 0.9;
-    font-weight: 300;
-    max-width: 600px;
-    margin: 0 auto;
+.home-header p {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    color: #f1f5ff;
 }
 
-.portal-cards {
+.role-card {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 3rem;
-    max-width: 800px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px;
+    max-width: 850px;
     width: 100%;
 }
 
-.portal-card {
-    background: rgba(255, 255, 255, 0.98);
-    padding: 3rem 2rem;
-    border-radius: 20px;
+.card {
+    background: rgba(255, 255, 255, 0.97);
+    padding: 32px 28px;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 18px;
     text-align: center;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-    transition: all 0.3s ease;
-    cursor: pointer;
-    backdrop-filter: blur(10px);
+    box-shadow: 0 12px 30px rgba(20, 25, 70, 0.16);
+    transition: transform 0.25s ease,
+                box-shadow 0.25s ease;
 }
 
-.portal-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.25);
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 18px 38px rgba(20, 25, 70, 0.24);
 }
 
-.portal-icon {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 2rem;
-    font-size: 3rem;
-    color: white;
-}
-
-.student-card .portal-icon {
-    background: linear-gradient(135deg, #4f9cf9, #3b82f6);
-}
-
-.staff-card .portal-icon {
-    background: linear-gradient(135deg, #10b981, #059669);
-}
-
-.portal-card h3 {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-    color: #333;
-    font-weight: 600;
-}
-
-.portal-card p {
-    color: #666;
-    margin-bottom: 2.5rem;
-    font-size: 1.1rem;
-    line-height: 1.5;
-}
-
-.portal-btn {
-    padding: 1rem 2rem;
-    border: none;
-    border-radius: 30px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    color: white;
-    min-width: 180px;
-    background: linear-gradient(135deg, #667eea, #764ba2);
-}
-
-.portal-btn:hover {
-    background: linear-gradient(135deg, #5a67d8, #6b46c1);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-}
-
-/* Header */
-.header {
-    text-align: center;
-    margin-bottom: 2rem;
-    color: white;
-}
-
-.header h2 {
+.card-icon {
     font-size: 2.5rem;
-    margin-bottom: 0.5rem;
+    margin: 0 auto 20px;
+    border-radius: 18px;
+    width: 82px;
+    height: 82px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 1rem;
 }
 
-.back-btn {
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    padding: 0.5rem 1rem;
-    border-radius: 25px;
+.student-icon {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+}
+
+.staff-icon {
+    background: linear-gradient(135deg, #10b981, #047857);
+}
+
+.card h2 {
+    font-size: 1.6rem;
+    margin-bottom: 12px;
+    color: #263247;
+}
+
+.card p {
+    color: #64748b;
+    margin-bottom: 24px;
+    min-height: 50px;
+}
+
+.card .btn {
+    width: 100%;
+}
+
+/* 4. Buttons */
+.btn {
+    display: inline-block;
+    padding: 11px 22px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-align: center;
     cursor: pointer;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    margin-bottom: 1rem;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
 }
 
-.back-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
-    border-color: rgba(255, 255, 255, 0.5);
+.btn:hover {
+    transform: translateY(-2px);
 }
 
-/* Tabs */
-.tabs {
+.btn-primary {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: #ffffff;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    box-shadow: 0 5px 14px rgba(37, 99, 235, 0.2);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #10b981, #047857);
+    color: #ffffff;
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #059669, #065f46);
+    box-shadow: 0 5px 14px rgba(16, 185, 129, 0.2);
+}
+
+.btn-outline {
+    background: #ffffff;
+    color: #3157c9;
+    border: 1px solid #c7d2fe;
+}
+
+.btn-outline:hover {
+    background: #eef2ff;
+    color: #1e40af;
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #ffffff;
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+}
+
+/* 5. Dashboard Header */
+.header {
+    background: rgba(255, 255, 255, 0.98);
+    padding: 18px 5%;
     display: flex;
-    justify-content: center;
-    margin-bottom: 2rem;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 15px;
-    padding: 5px;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    box-shadow: 0 3px 14px rgba(0, 0, 0, 0.08);
+}
+
+.header h1 {
+    color: #3349a5;
+    font-size: clamp(1.25rem, 3vw, 1.8rem);
+}
+
+/* 6. Dashboard Container */
+.dashboard-container {
+    max-width: 1200px;
+    margin: 32px auto;
+    padding: 0 24px 32px;
+}
+
+/* 7. Staff Navigation Tabs */
+.tab {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.97);
+    padding: 8px;
+    border-radius: 12px 12px 0 0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
 }
 
 .tab-btn {
-    background: none;
+    flex: 1;
+    min-width: 130px;
+    padding: 13px 16px;
     border: none;
-    padding: 12px 24px;
-    border-radius: 10px;
+    border-radius: 8px;
+    background: transparent;
     cursor: pointer;
-    color: white;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.tab-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #64748b;
 }
 
 .tab-btn.active {
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
+    background: linear-gradient(135deg, #3b82f6, #4f46e5);
+    color: #ffffff;
 }
 
-/* Tab Content */
+.tab-btn:hover:not(.active) {
+    background: #eef2ff;
+    color: #3157c9;
+}
+
+/* 8. Tab Content */
 .tab-content {
     display: none;
+    background: rgba(255, 255, 255, 0.98);
+    padding: 28px;
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 3px 14px rgba(0, 0, 0, 0.08);
 }
 
 .tab-content.active {
     display: block;
 }
 
-/* Cards */
-.card {
-    background: rgba(255, 255, 255, 0.95);
-    padding: 2rem;
-    border-radius: 15px;
-    margin-bottom: 2rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+/* 9. Forms */
+.form-section {
+    margin-bottom: 26px;
+    padding: 24px;
+    background: #f8faff;
+    border-radius: 12px;
+    border: 1px solid #e1e8f5;
 }
 
-.card h3 {
-    margin-bottom: 1.5rem;
-    color: #333;
-    font-size: 1.5rem;
+.form-section h3 {
+    margin-bottom: 18px;
+    color: #334155;
 }
 
-/* Forms */
-.form {
+.form-row {
     display: grid;
-    gap: 1rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 16px;
 }
 
-.form-group {
-    display: flex;
-    flex-direction: column;
-}
-
-.form-group label {
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-    color: #333;
-}
-
-.form-group input,
-.form-group textarea,
-.form-group select {
-    padding: 12px;
-    border: 2px solid #e1e5e9;
+input,
+textarea,
+select {
+    width: 100%;
+    min-width: 0;
+    padding: 12px 14px;
+    border: 1px solid #d5ddeb;
     border-radius: 8px;
-    font-size: 1rem;
-    transition: border-color 0.3s ease;
+    background: #ffffff;
+    color: #263247;
+    font-size: 0.95rem;
+    transition: border-color 0.2s ease,
+                box-shadow 0.2s ease;
 }
 
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus {
+input:focus,
+textarea:focus,
+select:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #4f70e8;
+    box-shadow: 0 0 0 3px rgba(79, 112, 232, 0.12);
 }
 
-.form-group small {
-    margin-top: 0.5rem;
-    color: #666;
+input::placeholder,
+textarea::placeholder {
+    color: #94a3b8;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 110px;
+}
+
+label {
+    display: block;
+    margin-bottom: 6px;
+    color: #475569;
+    font-weight: 600;
     font-size: 0.9rem;
 }
 
-/* Buttons */
-.btn {
-    padding: 12px 24px;
-    border-radius: 25px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-    border: none;
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
 }
 
-.btn-primary {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: white;
+form .form-row {
+    width: 100%;
 }
 
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+.assignment-options {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 }
 
-.btn-secondary {
-    background: #f8f9fa;
-    color: #333;
-    border: 2px solid #dee2e6;
+/* 10. Tables */
+.table-section {
+    background: #f8faff;
+    padding: 24px;
+    margin-top: 24px;
+    border-radius: 12px;
+    border: 1px solid #e1e8f5;
 }
 
-.btn-secondary:hover {
-    background: #e9ecef;
-    border-color: #adb5bd;
+.table-section h3 {
+    margin-bottom: 16px;
+    color: #334155;
 }
 
-.btn-danger {
-    background: #dc3545;
-    color: white;
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-weight: 500;
+.table,
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
 }
 
-.btn-danger:hover {
-    background: #c82333;
-    transform: translateY(-1px);
+.table th,
+.table td,
+table th,
+table td {
+    padding: 13px 14px;
+    text-align: left;
+    border-bottom: 1px solid #e5eaf2;
+    overflow-wrap: anywhere;
 }
 
-.btn-success {
-    background: #28a745;
-    color: white;
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-weight: 500;
+.table th,
+table th {
+    background: #edf2ff;
+    color: #3349a5;
+    font-weight: 700;
 }
 
-.btn-success:hover {
-    background: #218838;
-    transform: translateY(-1px);
+.table tr:hover,
+table tbody tr:hover {
+    background: #f5f7ff;
 }
 
-.btn-sm {
-    padding: 6px 12px;
-    font-size: 0.875rem;
-}
-
-/* Tables */
-.table-container {
+.table-section > div {
     overflow-x: auto;
 }
 
-.data-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 1rem;
-}
-
-.data-table th,
-.data-table td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #dee2e6;
-}
-
-.data-table th {
-    background: #f8f9fa;
-    font-weight: 600;
-    color: #333;
-}
-
-.data-table tr:hover {
-    background: #f8f9fa;
-}
-
-/* Tasks Grid */
-.tasks-grid {
-    display: grid;
-    gap: 1.5rem;
-}
-
-.task-card {
-    background: #f8f9fa;
-    padding: 1.5rem;
-    border-radius: 10px;
-    border-left: 4px solid #667eea;
-    transition: all 0.3s ease;
-}
-
-.task-card:hover {
-    transform: translateX(5px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-
-.task-card h4 {
-    margin-bottom: 0.5rem;
-    color: #333;
-}
-
-.task-card p {
-    color: #666;
-    margin-bottom: 1rem;
-}
-
-.task-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-    font-size: 0.9rem;
-    color: #666;
-}
-
-.task-actions {
-    display: flex;
-    gap: 10px;
-}
-
-.status-badge {
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 600;
-}
-
-.status-pending {
-    background: #fff3cd;
-    color: #856404;
-}
-
-.status-submitted {
-    background: #d4edda;
-    color: #155724;
-}
-
-.status-overdue {
-    background: #f8d7da;
-    color: #721c24;
-}
-
-/* Submissions */
-.submissions-grid {
-    display: grid;
-    gap: 1.5rem;
-}
-
-.submission-card {
-    background: #f8f9fa;
-    padding: 1.5rem;
-    border-radius: 10px;
-    border: 1px solid #dee2e6;
-}
-
-.submission-card h4 {
-    margin-bottom: 1rem;
-    color: #333;
-}
-
-.submission-meta {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    margin-bottom: 1rem;
-    font-size: 0.9rem;
-}
-
-.submission-meta div {
+/* 11. Student Login */
+.login-container {
     display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 32px 24px;
+    max-width: 460px;
+    margin: 0 auto;
 }
 
-.submission-meta strong {
-    color: #333;
-    margin-bottom: 0.25rem;
-}
-
-.submission-actions {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-.no-tasks, .no-submissions {
+.login-container h2 {
+    color: #ffffff;
+    margin-bottom: 28px;
+    font-size: clamp(2rem, 5vw, 2.5rem);
     text-align: center;
-    color: #666;
-    font-style: italic;
-    padding: 2rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.submission-info {
-    background: #e8f5e8;
-    padding: 1rem;
-    border-radius: 8px;
-    margin-top: 1rem;
+.student-select {
+    width: 100%;
+    max-width: 340px;
+    margin-bottom: 16px;
+    font-size: 1rem;
 }
 
-.submission-info p {
-    margin-bottom: 0.5rem;
-    color: #333;
+.login-container .btn {
+    width: 100%;
+    max-width: 340px;
+    margin-top: 10px;
 }
 
-/* Modal */
-.modal {
+/* 12. Student Dashboard */
+#studentWelcome {
+    color: #ffffff;
+    margin-bottom: 24px;
+}
+
+#studentPage .dashboard-container > h3 {
+    color: #ffffff;
+    margin-bottom: 18px;
+}
+
+#studentTasks {
+    width: 100%;
+    overflow-wrap: anywhere;
+}
+
+.task-card,
+.assignment-card {
+    background: #ffffff;
+    border: 1px solid #e1e8f5;
+    border-radius: 12px;
+    padding: 22px;
+    margin-bottom: 18px;
+    box-shadow: 0 5px 16px rgba(20, 25, 70, 0.08);
+}
+
+.task-card h3,
+.assignment-card h3 {
+    color: #3349a5;
+    margin-bottom: 12px;
+}
+
+.task-card p,
+.assignment-card p {
+    margin: 8px 0;
+    color: #475569;
+}
+
+/* 13. Assignment Upload Modal */
+#uploadModal.modal {
     display: none;
     position: fixed;
-    z-index: 2000;
-    left: 0;
-    top: 0;
+    inset: 0;
+    z-index: 1000;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(5px);
+    padding: 20px;
+    background: rgba(15, 23, 42, 0.62);
+    justify-content: center;
+    align-items: center;
+    overflow-y: auto;
+}
+
+#uploadModal.modal.show {
+    display: flex;
 }
 
 .modal-content {
-    background-color: white;
-    margin: 5% auto;
-    border-radius: 15px;
-    width: 90%;
+    position: relative;
+    width: 100%;
     max-width: 500px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    animation: modalFadeIn 0.3s ease;
+    max-height: 85vh;
+    overflow-y: auto;
+    margin: auto;
+    padding: 30px;
+    background: #ffffff;
+    color: #263247;
+    border-radius: 14px;
+    box-shadow: 0 18px 55px rgba(0, 0, 0, 0.25);
 }
 
-@keyframes modalFadeIn {
-    from { opacity: 0; transform: translateY(-50px); }
-    to { opacity: 1; transform: translateY(0); }
+.modal-content h3 {
+    margin: 0 30px 20px 0;
+    color: #3349a5;
 }
 
-.modal-header {
-    padding: 2rem 2rem 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #dee2e6;
+.modal-content p {
+    margin: 12px 0;
+    line-height: 1.6;
+    color: #475569;
+    overflow-wrap: anywhere;
 }
 
-.modal-header h3 {
-    margin: 0;
-    color: #333;
-}
-
-.close {
-    font-size: 2rem;
+.modal-content .close {
+    position: absolute;
+    top: 14px;
+    right: 18px;
+    font-size: 27px;
+    line-height: 1;
     cursor: pointer;
-    color: #aaa;
-    transition: color 0.3s ease;
+    color: #64748b;
 }
 
-.close:hover {
-    color: #333;
+.modal-content .close:hover {
+    color: #dc2626;
 }
 
-.modal-body {
-    padding: 2rem;
+.file-upload-section {
+    margin: 22px 0;
 }
 
-.modal-actions {
-    display: flex;
-    gap: 1rem;
-    justify-content: flex-end;
-    margin-top: 2rem;
-}
-
-/* Toast */
-.toast {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: #333;
-    color: white;
-    padding: 15px 20px;
+.file-input-label {
+    display: inline-block;
+    padding: 10px 16px;
+    background: #edf2ff;
+    color: #3157c9;
+    border: 1px solid #c7d2fe;
     border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    transform: translateX(400px);
-    transition: transform 0.3s ease;
-    z-index: 3000;
-    max-width: 300px;
+    font-weight: 600;
+    cursor: pointer;
 }
 
-.toast.show {
-    transform: translateX(0);
+.file-input-label:hover {
+    background: #dbe5ff;
 }
 
-.toast.success {
-    background: #28a745;
+.selected-file {
+    margin-top: 10px;
+    color: #64748b;
+    overflow-wrap: anywhere;
 }
 
-.toast.error {
-    background: #dc3545;
+.modal-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 24px;
 }
 
-.toast.info {
-    background: #17a2b8;
+.modal-buttons .btn {
+    flex: 1;
 }
 
-/* Responsive Design */
+/* 14. Responsive Design - Tablets */
 @media (max-width: 768px) {
-    .main-title {
-        font-size: 2.5rem;
+    .home-container {
+        padding: 32px 18px;
     }
 
-    .main-subtitle {
-        font-size: 1.1rem;
+    .home-header {
+        margin-bottom: 32px;
     }
 
-    .portal-cards {
+    .role-card {
         grid-template-columns: 1fr;
-        gap: 2rem;
+        max-width: 480px;
+        gap: 20px;
     }
 
-    .portal-card {
-        padding: 2rem 1.5rem;
+    .card {
+        padding: 26px 22px;
     }
 
-    .portal-icon {
-        width: 80px;
-        height: 80px;
-        font-size: 2.5rem;
+    .header {
+        padding: 16px 20px;
     }
 
-    .tabs {
+    .dashboard-container {
+        margin: 22px auto;
+        padding: 0 16px 25px;
+    }
+
+    .tab-content {
+        padding: 20px;
+    }
+
+    .form-section,
+    .table-section {
+        padding: 18px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .tab-btn {
+        padding: 12px 10px;
+    }
+}
+
+/* 15. Responsive Design - Mobile */
+@media (max-width: 480px) {
+    body {
+        font-size: 14px;
+    }
+
+    .home-header h1 {
+        font-size: 2rem;
+    }
+
+    .home-header p {
+        font-size: 1rem;
+    }
+
+    .header {
         flex-direction: column;
         align-items: stretch;
     }
 
+    .header h1 {
+        font-size: 1.35rem;
+    }
+
+    .header .btn {
+        width: 100%;
+    }
+
+    .tab {
+        flex-direction: column;
+    }
+
     .tab-btn {
-        justify-content: center;
-        margin-bottom: 5px;
+        width: 100%;
     }
 
-    .container {
-        padding: 15px;
+    .tab-content {
+        padding: 14px;
     }
 
-    .form {
-        gap: 1.5rem;
+    .form-section,
+    .table-section {
+        padding: 14px;
     }
 
-    .submission-meta {
+    .form-row {
         grid-template-columns: 1fr;
     }
 
     .modal-content {
-        margin: 10% auto;
-        width: 95%;
+        padding: 25px 18px;
     }
 
-    .modal-header,
-    .modal-body {
-        padding: 1.5rem;
-    }
-
-    .task-actions,
-    .submission-actions {
+    .modal-buttons {
         flex-direction: column;
     }
 
-    .task-actions button,
-    .submission-actions button {
+    .modal-buttons .btn {
         width: 100%;
+    }
+
+    .table th,
+    .table td,
+    table th,
+    table td {
+        padding: 9px;
+        font-size: 0.82rem;
+    }
+}
+
+/* ==========================================
+   IMPROVEMENT 1: STUDENT TASK CARDS
+========================================== */
+
+#studentTasks .task-card,
+#studentTasks .assignment-card {
+    background: #ffffff;
+    padding: 24px;
+    margin: 0 0 20px;
+    border: 1px solid #e0e7ff;
+    border-left: 5px solid #6366f1;
+    border-radius: 14px;
+    box-shadow: 0 5px 18px rgba(31, 41, 90, 0.09);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#studentTasks .task-card:hover,
+#studentTasks .assignment-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px rgba(31, 41, 90, 0.14);
+}
+
+#studentTasks h3 {
+    color: #3349a5;
+    font-size: 1.25rem;
+    margin-bottom: 12px;
+}
+
+#studentTasks p {
+    margin: 9px 0;
+    line-height: 1.7;
+    color: #475569;
+    overflow-wrap: anywhere;
+}
+
+#studentTasks strong,
+#studentTasks b {
+    color: #334155;
+}
+
+#studentTasks a,
+#studentTasks button {
+    margin-top: 8px;
+}
+
+#studentTasks button {
+    border-radius: 8px;
+}
+
+/* ==========================================
+   STAFF TASK PROGRESS TRACKER
+========================================== */
+
+/*
+  Important: loadTaskTracker() inserts .tracker-grid inside #taskTracker.
+  Therefore #taskTracker must be block-level; otherwise the grid becomes
+  a single item inside another grid cell and only uses half the available width.
+*/
+#trackerTab {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+#trackerTab > h3 {
+    margin-bottom: 20px;
+    color: #3349a5;
+    font-size: 1.4rem;
+}
+
+#taskTracker {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+#taskTracker .tracker-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+    width: 100%;
+    max-width: 100%;
+    align-items: stretch;
+    box-sizing: border-box;
+}
+
+#taskTracker .tracker-item {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    padding: 26px;
+    box-sizing: border-box;
+    background: #ffffff;
+    border: 1px solid #e0e7ff;
+    border-top: 4px solid #6366f1;
+    border-radius: 14px;
+    box-shadow: 0 5px 18px rgba(31, 41, 90, 0.08);
+    overflow-wrap: anywhere;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+#taskTracker .tracker-item:hover {
+    box-shadow: 0 9px 24px rgba(31, 41, 90, 0.13);
+    transform: translateY(-2px);
+}
+
+#taskTracker .tracker-header h4 {
+    margin: 0 0 12px;
+    color: #2563eb;
+    font-size: 1.35rem;
+}
+
+#taskTracker .tracker-status {
+    margin-bottom: 14px;
+}
+
+#taskTracker .tracker-details p {
+    margin: 10px 0;
+    color: #475569;
+    font-size: 0.96rem;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+#taskTracker strong,
+#taskTracker b {
+    color: #334155;
+}
+
+#taskTracker .file-info {
+    margin-top: 14px;
+    overflow-wrap: anywhere;
+}
+
+#taskTracker .file-link {
+    cursor: pointer;
+    overflow-wrap: anywhere;
+}
+
+#taskTracker .download-btn,
+#submissionsTable button,
+#studentTasks button {
+    display: inline-block;
+    margin: 8px 5px 6px 0;
+    padding: 10px 18px;
+    background: linear-gradient(135deg, #3b82f6, #4f46e5);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#taskTracker .download-btn:hover,
+#submissionsTable button:hover,
+#studentTasks button:hover {
+    background: linear-gradient(135deg, #2563eb, #3730a3);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(59, 130, 246, 0.25);
+}
+
+#taskTracker .task-status {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    background: #f1f5f9;
+    color: #475569;
+}
+
+#taskTracker .status-completed {
+    background: #dcfce7;
+    color: #166534;
+}
+
+#taskTracker .status-submitted {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+#taskTracker .status-pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+#taskTracker .task-status.overdue {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+/* Student Assignment Submissions table */
+#trackerTab .table-section {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+#submissionsTable {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+}
+
+#submissionsTable table,
+#submissionsTable .table {
+    width: 100%;
+    min-width: 650px;
+    table-layout: auto;
+    border-collapse: collapse;
+}
+
+#submissionsTable th {
+    white-space: nowrap;
+    padding: 14px 16px;
+    text-align: left;
+    background: #edf2ff;
+    color: #3349a5;
+}
+
+#submissionsTable td {
+    padding: 14px 16px;
+    vertical-align: middle;
+    overflow-wrap: anywhere;
+    line-height: 1.6;
+}
+
+#submissionsTable td:last-child {
+    min-width: 110px;
+}
+
+/* Responsive layouts */
+@media (max-width: 768px) {
+    #taskTracker .tracker-grid {
+        grid-template-columns: 1fr;
+    }
+
+    #taskTracker .tracker-item {
+        padding: 20px;
+    }
+
+    #trackerTab .table-section {
+        padding: 18px;
     }
 }
 
 @media (max-width: 480px) {
-    .main-title {
-        font-size: 2rem;
+    #taskTracker .tracker-item {
+        padding: 16px;
     }
 
-    .header h2 {
-        font-size: 2rem;
+    #taskTracker .tracker-header h4 {
+        font-size: 1.2rem;
     }
 
-    .portal-card h3 {
-        font-size: 1.5rem;
-    }
-
-    .home-container {
-        padding: 1rem;
-    }
-
-    .hero-section {
-        margin-bottom: 3rem;
+    #submissionsTable th,
+    #submissionsTable td {
+        padding: 9px;
+        font-size: 0.82rem;
     }
 }
