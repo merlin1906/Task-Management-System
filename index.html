@@ -1,244 +1,226 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>College Task Management System</title>
+    <title>CTMS - College Task Management System</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
+
     <!-- Home Page -->
     <div id="homePage" class="page active">
         <div class="home-container">
-            <div class="hero-section">
-                <h1 class="main-title">College Task Management System</h1>
-                <p class="main-subtitle">Streamline your academic workflow</p>
+            <div class="home-header">
+                <h1>College Task Management System</h1>
+                <p>Streamline academic task management for students and staff</p>
             </div>
-            
-            <div class="portal-cards">
-                <div class="portal-card student-card" onclick="showStudentPortal()">
-                    <div class="portal-icon">
-                        <i class="fas fa-user-graduate"></i>
-                    </div>
-                    <h3>Student Portal</h3>
-                    <p>Access assignments and submit your work</p>
-                    <button class="portal-btn">Enter Portal</button>
+
+            <div class="role-card">
+                <div class="card">
+                    <div class="card-icon student-icon">👨‍🎓</div>
+                    <h2>Student Portal</h2>
+                    <p>Access assignments, upload submissions, and track your progress.</p>
+                    <button onclick="showStudentLogin()" class="btn btn-primary">
+                        Enter as Student
+                    </button>
                 </div>
-                
-                <div class="portal-card staff-card" onclick="showStaffPortal()">
-                    <div class="portal-icon">
-                        <i class="fas fa-chalkboard-teacher"></i>
-                    </div>
-                    <h3>Staff Portal</h3>
-                    <p>Manage students and assign tasks</p>
-                    <button class="portal-btn">Enter Portal</button>
+
+                <div class="card">
+                    <div class="card-icon staff-icon">👩‍🏫</div>
+                    <h2>Staff Portal</h2>
+                    <p>Manage students, assign tasks, and monitor academic progress.</p>
+                    <button onclick="showStaffDashboard()" class="btn btn-success">
+                        Enter as Staff
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Staff Portal -->
+    <!-- Staff Dashboard -->
     <div id="staffPage" class="page">
-        <div class="container">
-            <div class="header">
-                <button class="back-btn" onclick="showHomePage()">
-                    <i class="fas fa-arrow-left"></i> Back to Home
-                </button>
-                <h2><i class="fas fa-chalkboard-teacher"></i> Staff Portal</h2>
-            </div>
+        <header class="header">
+            <h1>CTMS - Staff Dashboard</h1>
+            <button onclick="showHomePage()" class="btn btn-outline">
+                Back to Home
+            </button>
+        </header>
 
-            <div class="tabs">
+        <div class="dashboard-container">
+
+            <!-- Staff Navigation Tabs -->
+            <div class="tab">
                 <button class="tab-btn active" onclick="showTab('students')">
-                    <i class="fas fa-users"></i> Students
+                    Manage Students
                 </button>
                 <button class="tab-btn" onclick="showTab('tasks')">
-                    <i class="fas fa-tasks"></i> Tasks
+                    Assign Tasks
                 </button>
-                <button class="tab-btn" onclick="showTab('submissions')">
-                    <i class="fas fa-clipboard-list"></i> Submissions
+                <button class="tab-btn" onclick="showTab('tracker')">
+                    Task Tracker
                 </button>
             </div>
 
-            <!-- Students Tab -->
+            <!-- Manage Students Tab -->
             <div id="studentsTab" class="tab-content active">
-                <div class="card">
+                <div class="form-section">
                     <h3>Add New Student</h3>
-                    <form id="studentForm" class="form">
-                        <div class="form-group">
-                            <label for="studentId">Student ID</label>
-                            <input type="text" id="studentId" required>
+
+                    <form id="studentForm">
+                        <div class="form-row">
+                            <input type="text" id="studentName"
+                                   placeholder="Student Name" required>
+                            <input type="text" id="rollNumber"
+                                   placeholder="Roll Number" required>
                         </div>
-                        <div class="form-group">
-                            <label for="studentName">Student Name</label>
-                            <input type="text" id="studentName" required>
+
+                        <div class="form-row">
+                            <input type="text" id="studentClass"
+                                   placeholder="Class / Department" required>
+                            <input type="text" id="yearOfStudy"
+                                   placeholder="Year of Study" required>
                         </div>
-                        <div class="form-group">
-                            <label for="studentDepartment">Department</label>
-                            <select id="studentDepartment" required>
-                                <option value="">Select Department</option>
-                                <option value="Computer Science">Computer Science</option>
-                                <option value="Information Technology">Information Technology</option>
-                                <option value="Electronics">Electronics</option>
-                                <option value="Mechanical">Mechanical</option>
-                                <option value="Civil">Civil</option>
-                                <option value="Electrical">Electrical</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="studentClass">Class</label>
-                            <input type="text" id="studentClass" placeholder="e.g., 3rd Year" required>
-                        </div>
+
                         <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-plus"></i> Add Student
+                            Add Student
                         </button>
                     </form>
-                </div>
 
-                <div class="card">
-                    <h3>Students List</h3>
-                    <div class="table-container">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Name</th>
-                                    <th>Department</th>
-                                    <th>Class</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="studentsTableBody">
-                            </tbody>
-                        </table>
+                    <div class="table-section">
+                        <h3>Student List</h3>
+                        <div id="studentsTable">No students added yet.</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Tasks Tab -->
+            <!-- Assign Tasks Tab -->
             <div id="tasksTab" class="tab-content">
-                <div class="card">
-                    <h3>Create New Task</h3>
-                    <form id="taskForm" class="form">
-                        <div class="form-group">
-                            <label for="taskTitle">Task Title</label>
-                            <input type="text" id="taskTitle" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="taskDescription">Description</label>
-                            <textarea id="taskDescription" rows="3" required></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="taskDeadline">Deadline</label>
-                            <input type="datetime-local" id="taskDeadline" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="assignmentType">Assignment Type</label>
-                            <select id="assignmentType" onchange="handleAssignmentTypeChange()" required>
-                                <option value="">Select Assignment Type</option>
-                                <option value="individual">Individual Student</option>
-                                <option value="department">Entire Department</option>
+                <div class="form-section">
+                    <h3>Assign New Task</h3>
+
+                    <form id="taskForm">
+                        <input type="text" id="taskTitle"
+                               placeholder="Task Title" required>
+
+                        <textarea id="taskDescription"
+                                  placeholder="Task Description" required></textarea>
+
+                        <label for="taskDeadline">Deadline</label>
+                        <input type="date" id="taskDeadline" required>
+
+                        <div class="assignment-options">
+                            <label for="assignmentType">Assign To</label>
+                            <select id="assignmentType"
+                                    onchange="updateAssignmentOptions()">
+                                <option value="individual">Individual Students</option>
+                                <option value="class">Entire Class</option>
+                                <option value="year">Entire Year</option>
                             </select>
                         </div>
-                        <div class="form-group" id="departmentGroup" style="display: none;">
-                            <label for="assignToDepartment">Select Department</label>
-                            <select id="assignToDepartment">
-                                <option value="">Select Department</option>
-                                <option value="Computer Science">Computer Science</option>
-                                <option value="Information Technology">Information Technology</option>
-                                <option value="Electronics">Electronics</option>
-                                <option value="Mechanical">Mechanical</option>
-                                <option value="Civil">Civil</option>
-                                <option value="Electrical">Electrical</option>
-                            </select>
-                        </div>
-                        <div class="form-group" id="studentGroup" style="display: none;">
-                            <label for="assignToStudent">Select Student</label>
-                            <select id="assignToStudent">
-                                <option value="">Select Student</option>
-                            </select>
-                        </div>
+
+                        <div id="assignmentTargets"></div>
+
                         <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-plus"></i> Create Task
+                            Assign Task
                         </button>
                     </form>
                 </div>
 
-                
-            </div>
-
-            <!-- Submissions Tab -->
-            <div id="submissionsTab" class="tab-content">
-                <div class="card">
-                    <h3>Student Submissions</h3>
-                    <div id="submissionsList" class="submissions-grid">
-                    </div>
+                <!-- Assigned Tasks List -->
+                <div class="table-section">
+                    <h3>Assigned Tasks</h3>
+                    <div id="tasksTable">No tasks assigned yet.</div>
                 </div>
             </div>
+
+            <!-- Task Tracker Tab -->
+            <div id="trackerTab" class="tab-content">
+                <h3>Task Progress Tracker</h3>
+
+                <div id="taskTracker">No tasks assigned yet.</div>
+
+                <div class="table-section">
+                    <h3>Student Assignment Submissions</h3>
+                    <div id="submissionsTable">No submissions yet.</div>
+                </div>
+            </div>
+
+        </div>
+        <!-- dashboard-container CLOSED -->
+    </div>
+    <!-- staffPage CLOSED -->
+
+    <!-- Student Login: Outside staffPage -->
+    <div id="studentLoginPage" class="page">
+        <div class="login-container">
+            <h2>Student Login</h2>
+
+            <select id="studentSelect" class="student-select" required>
+                <option value="">Select Your Roll Number</option>
+            </select>
+
+            <button onclick="loginStudent()" class="btn btn-primary">
+                Login
+            </button>
+
+            <button onclick="showHomePage()" class="btn btn-outline">
+                Back to Home
+            </button>
         </div>
     </div>
 
-    <!-- Student Portal -->
+    <!-- Student Dashboard: Outside staffPage -->
     <div id="studentPage" class="page">
-        <div class="container">
-            <div class="header">
-                <button class="back-btn" onclick="showHomePage()">
-                    <i class="fas fa-arrow-left"></i> Back to Home
-                </button>
-                <h2><i class="fas fa-user-graduate"></i> Student Portal</h2>
-            </div>
+        <header class="header">
+            <h1>Student Dashboard</h1>
+            <button onclick="showHomePage()" class="btn btn-outline">
+                Back to Home
+            </button>
+        </header>
 
-            <div class="card">
-                <h3>Select Your Profile</h3>
-                <div class="form-group">
-                    <label for="studentSelect">Choose Student</label>
-                    <select id="studentSelect" onchange="loadStudentTasks()">
-                        <option value="">Select Student</option>
-                    </select>
-                </div>
-            </div>
-
-            <div id="studentTasksSection" class="card" style="display: none;">
-                <h3>Your Tasks</h3>
-                <div id="studentTasksList" class="tasks-grid">
-                </div>
-            </div>
+        <div class="dashboard-container">
+            <h2 id="studentWelcome">Welcome, Student!</h2>
+            <h3>My Tasks</h3>
+            <div id="studentTasks">No tasks assigned yet.</div>
         </div>
     </div>
 
-    <!-- Submission Modal -->
-    <div id="submissionModal" class="modal">
+    <!-- Assignment Upload Modal -->
+    <div id="uploadModal" class="modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h3>Submit Assignment</h3>
-                <span class="close" onclick="closeSubmissionModal()">&times;</span>
+
+            <span class="close" onclick="closeUploadModal()">&times;</span>
+
+            <h3>Upload Assignment</h3>
+            <div id="uploadTaskInfo"></div>
+
+            <div class="file-upload-section">
+                <label for="fileInput" class="file-input-label">
+                    Choose File
+                </label>
+
+                <input type="file" id="fileInput"
+                       accept=".pdf,.doc,.docx,.txt,.zip,.jpg,.png"
+                       style="display: none;">
+
+                <div id="selectedFileName" class="selected-file"></div>
             </div>
-            <div class="modal-body">
-                <form id="submissionForm">
-                    <input type="hidden" id="taskIdForSubmission">
-                    <div class="form-group">
-                        <label for="assignmentFile">Upload Assignment</label>
-                        <input type="file" id="assignmentFile" accept=".pdf,.doc,.docx,.txt,.jpg,.png" required>
-                        <small>Supported formats: PDF, DOC, DOCX, TXT, JPG, PNG</small>
-                    </div>
-                    <div class="form-group">
-                        <label for="submissionNotes">Notes (Optional)</label>
-                        <textarea id="submissionNotes" rows="3" placeholder="Add any notes about your submission..."></textarea>
-                    </div>
-                    <div class="modal-actions">
-                        <button type="button" class="btn btn-secondary" onclick="closeSubmissionModal()">Cancel</button>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-upload"></i> Submit Assignment
-                        </button>
-                    </div>
-                </form>
+
+            <div class="modal-buttons">
+                <button onclick="submitAssignment()" class="btn btn-primary">
+                    Submit Assignment
+                </button>
+                <button onclick="closeUploadModal()" class="btn btn-outline">
+                    Cancel
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="toast"></div>
-
+    <!-- JavaScript -->
     <script src="function.js"></script>
+
 </body>
 </html>
